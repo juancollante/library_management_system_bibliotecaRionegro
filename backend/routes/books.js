@@ -1,6 +1,7 @@
 import express from "express"
 import Book from "../models/Book.js"
 import BookCategory from "../models/BookCategory.js"
+import BookTransaction from "../models/BookTransaction.js"
 
 const router = express.Router()
 
@@ -89,14 +90,45 @@ router.delete("/removebook/:id", async (req, res) => {
         try {
             const _id = req.params.id
             const book = await Book.findOne({ _id })
+            
+            if (!book) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Book not found"
+                });
+            }
+            
+            // Check if book has active transactions
+            const activeTransactions = await BookTransaction.find({
+                bookId: _id,
+                transactionType: { $in: ["Issued", "Reserved"] }
+            });
+            
+            if (activeTransactions.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Cannot delete book with active transactions or reservations"
+                });
+            }
+            
             await book.remove()
             await BookCategory.updateMany({ '_id': book.categories }, { $pull: { books: book._id } });
-            res.status(200).json("Book has been deleted");
+            res.status(200).json({
+                success: true,
+                message: "Book has been deleted successfully"
+            });
         } catch (err) {
-            return res.status(504).json(err);
+            return res.status(500).json({
+                success: false,
+                message: "Error deleting book",
+                error: err.message
+            });
         }
     } else {
-        return res.status(403).json("You dont have permission to delete a book!");
+        return res.status(403).json({
+            success: false,
+            message: "You dont have permission to delete a book!"
+        });
     }
 })
 

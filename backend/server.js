@@ -7,6 +7,10 @@ import userRoutes from "./routes/users.js";
 import bookRoutes from "./routes/books.js";
 import transactionRoutes from "./routes/transactions.js";
 import categoryRoutes from "./routes/categories.js";
+import searchRoutes from "./routes/search.js";
+import statisticsRoutes from "./routes/statistics.js";
+import reservationRoutes from "./routes/reservations.js";
+import notificationRoutes from "./routes/notifications.js";
 
 /* App Config */
 dotenv.config();
@@ -23,6 +27,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/statistics", statisticsRoutes);
+app.use("/api/reservations", reservationRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 /* MongoDB connection */
 mongoose.connect(

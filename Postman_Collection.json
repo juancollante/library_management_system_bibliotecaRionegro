@@ -1,0 +1,721 @@
+{
+	"info": {
+		"_postman_id": "biblioteca-api-collection",
+		"name": "Sistema Bibliotecario - API Tests",
+		"description": "Collection completa para probar todas las APIs del sistema bibliotecario",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticación",
+			"item": [
+				{
+					"name": "Registrar Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"adminUserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Employee\",\n  \"userFullName\": \"Admin Sistema\",\n  \"employeeId\": \"EMP001\",\n  \"age\": 30,\n  \"dob\": \"1993-01-15\",\n  \"gender\": \"Male\",\n  \"address\": \"Calle Principal 123\",\n  \"mobileNumber\": 3001234567,\n  \"email\": \"admin@biblioteca.com\",\n  \"password\": \"admin123\",\n  \"isAdmin\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Estudiante",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Student created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"studentUserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Student\",\n  \"userFullName\": \"Juan Pérez\",\n  \"admissionId\": \"STU001\",\n  \"age\": 22,\n  \"dob\": \"2001-05-20\",\n  \"gender\": \"Male\",\n  \"address\": \"Carrera 45 #23-67\",\n  \"mobileNumber\": 3007654321,\n  \"email\": \"juan.perez@estudiante.com\",\n  \"password\": \"student123\",\n  \"isAdmin\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin login successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.isAdmin).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"EMP001\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Estudiante",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"admissionId\": \"STU001\",\n  \"password\": \"student123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Categorías",
+			"item": [
+				{
+					"name": "Crear Categoría",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryName\": \"Ficción\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/categories/addcategory",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"categories",
+								"addcategory"
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Todas las Categorías",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Categories retrieved successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    if (jsonData.length > 0) {",
+									"        pm.environment.set(\"categoryId\", jsonData[0]._id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/categories/allcategories",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"categories",
+								"allcategories"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Libros",
+			"item": [
+				{
+					"name": "Agregar Libro",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Book created successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"bookId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isAdmin\": true,\n  \"bookName\": \"Cien Años de Soledad\",\n  \"alternateTitle\": \"\",\n  \"author\": \"Gabriel García Márquez\",\n  \"bookCountAvailable\": 5,\n  \"language\": \"Español\",\n  \"publisher\": \"Editorial Sudamericana\",\n  \"bookStatus\": \"Available\",\n  \"categories\": [\"{{categoryId}}\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/books/addbook",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"addbook"
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Todos los Libros",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/books/allbooks",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"allbooks"
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Libro por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/books/getbook/{{bookId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"getbook",
+								"{{bookId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Búsqueda Avanzada",
+			"item": [
+				{
+					"name": "Búsqueda General",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Search results returned\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('success', true);",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/search/search?query=Cien&author=García",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"search",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Cien"
+								},
+								{
+									"key": "author",
+									"value": "García"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Libros con Paginación",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/search/paginated?page=1&limit=5",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"search",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Libros Disponibles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/search/available",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"search",
+								"available"
+							]
+						}
+					}
+				},
+				{
+					"name": "Libros Populares",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/search/popular?limit=3",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"search",
+								"popular"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Estadísticas",
+			"item": [
+				{
+					"name": "Dashboard General",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Dashboard stats retrieved\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('totalBooks');",
+									"    pm.expect(jsonData.data).to.have.property('totalUsers');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/statistics/dashboard",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"statistics",
+								"dashboard"
+							]
+						}
+					}
+				},
+				{
+					"name": "Estadísticas por Categoría",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/statistics/books-by-category",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"statistics",
+								"books-by-category"
+							]
+						}
+					}
+				},
+				{
+					"name": "Usuarios Más Activos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/statistics/active-users?limit=5",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"statistics",
+								"active-users"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Reservas",
+			"item": [
+				{
+					"name": "Crear Reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Reservation created successfully\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.environment.set(\"reservationId\", jsonData.data._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookId\": \"{{bookId}}\",\n  \"userId\": \"{{studentUserId}}\",\n  \"reservationDate\": \"2023-10-05T10:30:00.000Z\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/reservations/reserve",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"reservations",
+								"reserve"
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Todas las Reservas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/reservations/all-reservations",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"reservations",
+								"all-reservations"
+							]
+						}
+					}
+				},
+				{
+					"name": "Reservas de Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/reservations/user-reservations/{{studentUserId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"reservations",
+								"user-reservations",
+								"{{studentUserId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Notificaciones",
+			"item": [
+				{
+					"name": "Notificaciones de Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin notifications retrieved\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/notifications/admin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"notifications",
+								"admin"
+							]
+						}
+					}
+				},
+				{
+					"name": "Notificaciones de Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/notifications/user/{{studentUserId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"notifications",
+								"user",
+								"{{studentUserId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Contador de Notificaciones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/notifications/count/{{studentUserId}}",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"notifications",
+								"count",
+								"{{studentUserId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Tests de Error",
+			"item": [
+				{
+					"name": "Crear libro sin permisos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Access denied for non-admin\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isAdmin\": false,\n  \"bookName\": \"Libro Sin Permisos\",\n  \"author\": \"Autor Test\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/books/addbook",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"books",
+								"addbook"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		}
+	]
+}
