@@ -165,6 +165,451 @@
 							]
 						}
 					}
+				},
+				{
+					"name": "Login Admin 2 - Maria Rodriguez",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"EMP002\",\n  \"password\": \"maria123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Admin 3 - Carlos Martinez",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"EMP003\",\n  \"password\": \"carlos123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Estudiante 2 - Ana Garcia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"admissionId\": \"STU002\",\n  \"password\": \"ana123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Estudiante 3 - Luis Hernandez",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"admissionId\": \"STU003\",\n  \"password\": \"luis123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Empleado - Pedro Silva",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"employeeId\": \"EMP004\",\n  \"password\": \"pedro123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/signin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Admin 2 - Maria Rodriguez",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Admin 2 created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"admin2UserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Employee\",\n  \"userFullName\": \"Maria Rodriguez\",\n  \"employeeId\": \"EMP002\",\n  \"age\": 28,\n  \"dob\": \"1995-08-22\",\n  \"gender\": \"Female\",\n  \"address\": \"Avenida 15 #45-67\",\n  \"mobileNumber\": 3012345678,\n  \"email\": \"maria.rodriguez@biblioteca.com\",\n  \"password\": \"maria123\",\n  \"isAdmin\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Admin 3 - Carlos Martinez",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Admin 3 created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"admin3UserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Employee\",\n  \"userFullName\": \"Carlos Martinez\",\n  \"employeeId\": \"EMP003\",\n  \"age\": 35,\n  \"dob\": \"1988-12-10\",\n  \"gender\": \"Male\",\n  \"address\": \"Carrera 20 #30-15\",\n  \"mobileNumber\": 3023456789,\n  \"email\": \"carlos.martinez@biblioteca.com\",\n  \"password\": \"carlos123\",\n  \"isAdmin\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Estudiante 2 - Ana Garcia",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Student 2 created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"student2UserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Student\",\n  \"userFullName\": \"Ana Garcia\",\n  \"admissionId\": \"STU002\",\n  \"age\": 20,\n  \"dob\": \"2003-03-15\",\n  \"gender\": \"Female\",\n  \"address\": \"Calle 8 #12-34\",\n  \"mobileNumber\": 3034567890,\n  \"email\": \"ana.garcia@estudiante.com\",\n  \"password\": \"ana123\",\n  \"isAdmin\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Estudiante 3 - Luis Hernandez",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Student 3 created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"student3UserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Student\",\n  \"userFullName\": \"Luis Hernandez\",\n  \"admissionId\": \"STU003\",\n  \"age\": 19,\n  \"dob\": \"2004-07-08\",\n  \"gender\": \"Male\",\n  \"address\": \"Transversal 5 #22-11\",\n  \"mobileNumber\": 3045678901,\n  \"email\": \"luis.hernandez@estudiante.com\",\n  \"password\": \"luis123\",\n  \"isAdmin\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Estudiante 4 - Sofia Lopez",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Student 4 created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"student4UserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Student\",\n  \"userFullName\": \"Sofia Lopez\",\n  \"admissionId\": \"STU004\",\n  \"age\": 21,\n  \"dob\": \"2002-11-25\",\n  \"gender\": \"Female\",\n  \"address\": \"Diagonal 10 #18-90\",\n  \"mobileNumber\": 3056789012,\n  \"email\": \"sofia.lopez@estudiante.com\",\n  \"password\": \"sofia123\",\n  \"isAdmin\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Empleado (No Admin) - Pedro Silva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Employee created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"employeeUserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Employee\",\n  \"userFullName\": \"Pedro Silva\",\n  \"employeeId\": \"EMP004\",\n  \"age\": 32,\n  \"dob\": \"1991-04-18\",\n  \"gender\": \"Male\",\n  \"address\": \"Calle 25 #40-85\",\n  \"mobileNumber\": 3067890123,\n  \"email\": \"pedro.silva@biblioteca.com\",\n  \"password\": \"pedro123\",\n  \"isAdmin\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Empleado (No Admin) - Laura Moreno",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Employee 2 created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.environment.set(\"employee2UserId\", jsonData._id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userType\": \"Employee\",\n  \"userFullName\": \"Laura Moreno\",\n  \"employeeId\": \"EMP005\",\n  \"age\": 27,\n  \"dob\": \"1996-09-03\",\n  \"gender\": \"Female\",\n  \"address\": \"Avenida 30 #55-12\",\n  \"mobileNumber\": 3078901234,\n  \"email\": \"laura.moreno@biblioteca.com\",\n  \"password\": \"laura123\",\n  \"isAdmin\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseURL}}/auth/register",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					}
 				}
 			]
 		},
