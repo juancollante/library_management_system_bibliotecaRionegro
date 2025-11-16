@@ -1,117 +1,296 @@
-# Despliegue local de la aplicación "Biblioteca Rionegro" — Informe del montaje
+---
+
+# Informe final: despliegue local de plantilla HTML con Docker
 
 Fecha: 16-11-2025
 
-**Resumen**: Se preparó un entorno local reproducible para desplegar la web del proyecto `library_management_system_bibliotecaRionegro` como sitio estático servido por `nginx` en Docker. El proceso incluyó crear scripts de despliegue/chequeo, ajustar `docker-compose.yml` para servir la carpeta `frontend/build`, y aplicar soluciones para problemas encontrados durante la compilación del frontend (OpenSSL/Node y availability de `node`).
+Objetivo del informe
+ - Seleccionar una plantilla HTML gratuita y usarla como producto de prueba.
+ - Seleccionar una plataforma de desarrollo e implantación para montar un servidor de aplicaciones local completo.
+ - Documentar el paso a paso para la instalación de la plataforma y el montaje del producto, incluyendo capturas/plantillas para las imágenes.
 
-**Archivos añadidos / modificados**
-- **`docker-compose.yml`**: configura el servicio `web` con `nginx:alpine` y monta `./frontend/build` en `/usr/share/nginx/html` (puerto `8080`).
-- **`check.sh`**: script en la raíz que consulta `http://localhost:8080` hasta obtener HTTP 200.
-- **`deploy.sh`**: script automatizado que instala dependencias en `frontend/`, compila el build y levanta los contenedores (`docker compose up -d --build`). Incluye estrategias para resolver errores de OpenSSL y un fallback para ejecutar la compilación dentro de un contenedor `node:18` si no hay `node` local.
-- **`deploy/plantilla-landing/site/index.html`**: plantilla de ejemplo mínima (se añadió inicialmente para pruebas; el `build` real la reemplaza).
+1) Producto de prueba seleccionado (este proyecto)
 
-**Objetivo del ejercicio**
-- Utilizar la página web del proyecto (frontend React) como producto de prueba.
-- Seleccionar una plataforma de despliegue local reproducible: se eligió Docker (`nginx:alpine` + `docker compose`).
-- Generar documentación y capturas para el informe.
+Para este ejercicio NO se descargó una plantilla externa. En su lugar se utilizó la propia aplicación del repositorio —la página web de la Biblioteca Rionegro— como producto de prueba para el despliegue.
 
-**Pasos realizados (detallado y reproducible)**
+Detalle:
+- Producto de prueba: la aplicación contenida en `frontend/` del repositorio `library_management_system_bibliotecaRionegro`. Esta carpeta ya incluye una app React y, en este workspace, una carpeta `frontend/build/` generada durante las pruebas.
+- Nota alternativa: en el repo también se incluyó una plantilla mínima de ejemplo en `deploy/plantilla-landing/site/` para pruebas rápidas, pero la entrega y el montaje final usan la versión compilada del `frontend`.
 
-1) Preparación y archivos iniciales
+2) Selección de la plataforma de desarrollo e implantación
 
-- Añadir `docker-compose.yml` en la raíz: monta `./frontend/build` en nginx y publica `8080`.
-- Crear `check.sh` y `deploy.sh` para automatizar verificación y despliegue.
+Plataforma elegida: Docker + Docker Compose con `nginx:alpine` como servidor estático.
 
-2) Compilar el frontend (build)
+Motivación:
+- Reproducibilidad: Docker garantiza que el servicio se ejecuta de forma idéntica en distintas máquinas.
+- Aislamiento: no modifica la configuración local del host (salvo archivos montados explícitamente).
+- Facilidad: `nginx` sirve archivos estáticos eficientemente; `docker compose` orquesta el servicio.
 
-- Desde la raíz del repo puedes ejecutar:
+Alternativas válidas: XAMPP (Windows), `python -m http.server` para pruebas rápidas, o un servidor Node/Express si se necesitara más lógica.
 
+3) Requisitos previos
+
+- Docker Desktop (Windows/WSL2) o Docker Engine en Linux.
+- Git (para clonar el repositorio) y acceso al repositorio.
+- Node.js (opcional) si se compila el `frontend` localmente (se incluye fallback para usar `node:18` en Docker si no está instalado).
+
+4) Instalación de la plataforma (resumen rápido)
+
+Windows (recomendado con WSL2):
+ - Instalar WSL2 si no está activo: en PowerShell (administrador): `wsl --install`.
+ - Descargar e instalar Docker Desktop: https://www.docker.com/products/docker-desktop
+ - Habilitar integración con WSL2 cuando el instalador lo pida.
+
+Linux (ejemplo Ubuntu):
 ```
-chmod +x deploy.sh
-./deploy.sh
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER  # cerrar sesión/abrir para aplicar
 ```
 
-- Qué hace `deploy.sh` (resumen):
-	- Entra en `frontend/` y ejecuta `npm install`.
-	- Intenta compilar con `node` local aplicando `--openssl-legacy-provider` si es necesario.
-	- Si `node` no está disponible, usa Docker para ejecutar la compilación dentro de `node:18`.
-	- Levanta (o reconstruye) el servicio nginx con `docker compose up -d --build`.
-	- Ejecuta `./check.sh` para comprobar que `http://localhost:8080` devuelve `200`.
+5) Preparación del producto para despliegue
 
-3) Verificación manual alternativa
+Verifica que existe el `frontend/build` (resultado de `npm run build`) en el repo. Si no existe, genera el build antes de desplegar (instrucciones más abajo).
 
-Si prefieres ejecutar manualmente los pasos:
+Captura sugerida: guardar `deploy/report/screenshots/01_build_tree.png` mostrando el árbol `frontend/build`.
+
+6) Montaje del servidor de aplicaciones local (paso a paso)
+
+Estructura principal usada:
+- `docker-compose.yml` en la raíz — monta `./frontend/build` en `/usr/share/nginx/html` del contenedor nginx y publica el puerto `8080`.
+
+Pasos:
+
+a) Si vas a usar la web del proyecto (React) como producto de prueba: construir la app
 
 ```
 cd frontend
 npm install
-# Si usas bash/WSL y tienes Node 17+ y ves errores OpenSSL, exporta:
+# En caso de error OpenSSL con Node >=17:
 export NODE_OPTIONS=--openssl-legacy-provider
 npm run build
-cd ..
+```
+
+b) Si no vas a compilar (usar la plantilla HTML descargada): copia la plantilla a la carpeta que sirve nginx:
+
+```
+rm -rf deploy/plantilla-landing/site/*
+cp -r path/to/your/template/* deploy/plantilla-landing/site/
+```
+
+c) Ejecutar Docker Compose (desde la raíz del repo):
+
+```
 docker compose up -d --build
+```
+
+d) Verificar que el sitio responde (script incluido):
+
+```
+chmod +x ./check.sh
 ./check.sh
 ```
 
-**Problemas encontrados y soluciones aplicadas**
+Capturas sugeridas:
+- `deploy/report/screenshots/02_docker_compose_up.png`: salida de `docker compose up -d`.
+- `deploy/report/screenshots/03_check_sh_ok.png`: salida de `./check.sh` indicando HTTP 200.
+- `deploy/report/screenshots/04_browser_render.png`: vista del navegador mostrando `http://localhost:8080`.
 
-- Duplicado accidental en `docker-compose.yml`: se detectó y eliminó la definición duplicada dejando una única configuración válida.
-- Error en `npm run build`: "Error: error:0308010C:digital envelope routines::unsupported" (código `ERR_OSSL_EVP_UNSUPPORTED`). Causado por incompatibilidad entre OpenSSL 3 (Node >= 17/20) y versiones antiguas de `webpack`/`react-scripts`.
-	- Soluciones aplicadas:
-		- En `deploy.sh` se exporta `NODE_OPTIONS=--openssl-legacy-provider` antes de `npm run build` como workaround.
-		- Si la variable de entorno no se propaga correctamente, `deploy.sh` intenta ejecutar directamente: `node --openssl-legacy-provider node_modules/react-scripts/scripts/build.js`.
-		- Si no hay `node` local, `deploy.sh` usa un contenedor `node:18-bullseye` para realizar `npm install` y la compilación con `--openssl-legacy-provider`.
+7) Problemas habituales y resolución
 
-- Problema al descargar la imagen Docker desde el host: error con helpers de credenciales (`docker: error getting credentials - err: exit status 1`).
-	- Diagnóstico y posibles soluciones:
-		- Ejecutar `docker logout` y volver a probar `docker pull node:18-bullseye`.
-		- Revisar y, si procede, editar temporalmente `~/.docker/config.json` para eliminar `credsStore` o `credHelpers` si están mal configurados (hacer copia de seguridad antes).
-		- Alternativa rápida: instalar Node 18 localmente (recomendado si no quieres lidiar con Docker credential helpers ahora) usando `nvm`.
+- Error OpenSSL (`ERR_OSSL_EVP_UNSUPPORTED`): solución temporal `export NODE_OPTIONS=--openssl-legacy-provider` o usar Node 18 LTS. `deploy.sh` incluye workarounds y fallback a `node:18` en Docker.
+- Problemas con descarga de imágenes Docker (credenciales): ejecutar `docker logout` y revisar `~/.docker/config.json` en caso de `credsStore` mal configurado.
 
-**Comandos útiles (resumen)**
+8) Documentación gráfica (capturas)
 
-- Levantar todo (script automático):
-	- `chmod +x deploy.sh && ./deploy.sh`
-- Comandos manuales (build + nginx):
-	- `cd frontend && npm install && export NODE_OPTIONS=--openssl-legacy-provider && npm run build`
-	- `cd .. && docker compose up -d --build && ./check.sh`
-- Probar Docker pull (si el script falla con error de credenciales):
-	- `docker logout`
-	- `docker pull node:18-bullseye`
-	- Si falla por `credsStore`, revisar `~/.docker/config.json`.
+Incluye capturas en `deploy/report/screenshots/` con los nombres sugeridos y, en el informe final, incrústalas en el Markdown así:
 
-**Verificación efectiva**
-
-- `./check.sh` comprueba repetidamente `http://localhost:8080` hasta recibir HTTP/200. Este script se ejecuta al final de `deploy.sh`.
-
-**Recomendaciones y pasos siguientes**
-
-- Recomendación inmediata: usar Node 18 (LTS) para desarrollo local y para CI. Instalar con `nvm` evita problemas de compatibilidad:
-
-```
-curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash
-source ~/.nvm/nvm.sh
-nvm install 18
-nvm use 18
+```markdown
+![Plantilla descargada](deploy/report/screenshots/01_template_files.png)
+![Docker up](deploy/report/screenshots/02_docker_compose_up.png)
+![Check OK](deploy/report/screenshots/03_check_sh_ok.png)
+![Sitio en navegador](deploy/report/screenshots/04_browser_render.png)
 ```
 
-- Para producción o pruebas compartidas, mantener el flujo con Docker es más reproducible: crear una imagen que incluya build y nginx es la siguiente mejora (multi-stage Dockerfile).
-- Añadir capturas en `report/screenshots/`: terminal con `docker --version`, estructura `frontend/build`, salida de `./deploy.sh`, y página cargada en `http://localhost:8080`.
+9) Entrega y recomendaciones finales
 
-**Rutas relevantes en este repositorio**
+- Para mantener reproducibilidad, se recomienda crear un `Dockerfile` multi-stage que construya el `frontend` y produzca una imagen final con `nginx` (esto evita depender del build en el host y simplifica despliegues).
+- Añadir un `.nvmrc` con `18` para el equipo de desarrollo y documentar la instalación de `nvm` en el README.
+- Incluir en la entrega las capturas y un `report/README_REPORT.md` que describa cada una.
+
+10) Archivos y rutas relevantes (resumen)
 - `docker-compose.yml` (raíz)
-- `deploy.sh` (raíz)
-- `check.sh` (raíz)
-- `deploy/README_DESPLIEGUE.md` (este archivo)
-- `deploy/plantilla-landing/site/` (plantilla de ejemplo)
-
-Si quieres que añada:
-- un `Dockerfile` multi-stage que construya el `frontend` y produzca una imagen final `nginx` lista para ejecutar, o
-- un `.nvmrc` con `18` y/o un `Makefile` con tareas `make build` / `make deploy`, dime y lo implemento.
+- `deploy.sh` (raíz): script automatizado (instala dependencias, build y levanta Docker).
+- `check.sh` (raíz): verificación HTTP 200.
+- `deploy/plantilla-landing/site/`: carpeta que el contenedor nginx sirve cuando se usa plantilla estática.
+- `deploy/report/screenshots/`: carpeta sugerida para guardar capturas del informe.
 
 ---
 
-Informe preparado por: tareas realizadas el 16-11-2025.
+---
+
+# Informe de despliegue local (proyecto: Biblioteca Rionegro)
+
+Este informe documenta el montaje completo realizado sobre el repositorio `library_management_system_bibliotecaRionegro` para desplegar localmente la web del proyecto (producto de prueba) usando **Docker Desktop** como plataforma de desarrollo e implantación local.
+
+Resumen rápido
+- Producto de prueba: la propia aplicación del repo `library_management_system_bibliotecaRionegro` (carpeta `frontend/`). El objetivo fue servir la versión compilada `frontend/build` mediante `nginx` en un contenedor Docker.
+- Plataforma elegida: **Docker Desktop** (con Docker Compose). Se usó `nginx:alpine` para servir archivos estáticos.
+
+Objetivos cubiertos
+- Seleccionar plantilla / producto de prueba: se utilizó la aplicación `frontend` del proyecto (ya contiene una app React y una carpeta `build/` generada).
+- Seleccionar la plataforma de despliegue: Docker Desktop (recomendado para Windows con WSL2) y Docker Compose.
+- Documentar el paso a paso para instalar la plataforma y montar el producto localmente, incluyendo las soluciones a los problemas encontrados.
+
+Estructura y ficheros relevantes (creados/modificados)
+- `docker-compose.yml` (raíz): servicio `web` con `nginx:alpine` que monta `./frontend/build` en `/usr/share/nginx/html`, mapea el puerto `8080`.
+- `deploy.sh` (raíz): script automatizado que instala dependencias (`npm install`), construye el `frontend` (build) y levanta `docker compose up -d --build`. Incluye workarounds para errores OpenSSL y un fallback que ejecuta la compilación dentro de `node:18` si no hay Node local.
+- `check.sh` (raíz): verifica que `http://localhost:8080` responda HTTP 200.
+- `deploy/plantilla-landing/site/`: plantilla de ejemplo mínima incluida para pruebas iniciales.
+- `deploy/README_DESPLIEGUE.md`: este informe.
+
+Requisitos previos (para Windows con Docker Desktop)
+- Windows 10/11 64-bit con WSL2 recomendado.
+- Docker Desktop (descargar de https://www.docker.com/products/docker-desktop). Durante la instalación habilitar integración con WSL2.
+- Git (para clonar y trabajar el repo).
+- Opcional: `nvm` y Node 18 para compilar localmente sin Docker.
+
+Instalación de Docker Desktop (resumen)
+1. Descargar el instalador de Docker Desktop desde https://www.docker.com/products/docker-desktop
+2. Ejecutar el instalador y habilitar integración con WSL2 cuando se solicite.
+3. Reiniciar el equipo si el instalador lo solicita.
+4. Verificar en PowerShell/WSL:
+
+```bash
+docker --version
+docker compose version
+```
+
+Instalación alternativa en Linux (breve):
+
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER  # reiniciar sesión para aplicar
+```
+
+Preparación del repositorio (usar este proyecto como producto de prueba)
+1. Clonar o situarse en el repositorio:
+
+```bash
+cd /ruta/al/repositorio/library_management_system_bibliotecaRionegro
+```
+
+2. Verificar que hay una versión compilada del frontend (`frontend/build`). Si no existe o quieres reconstruirla, compilarla (siguientes pasos).
+
+Compilar el frontend (opcional — si deseas servir la app React real)
+1. Instalar dependencias y compilar (desde la raíz del repo):
+
+```bash
+cd frontend
+npm install
+# En sistemas con Node >=17/20 puede aparecer un error OpenSSL.
+# Workaround (bash/WSL/Linux/macOS):
+export NODE_OPTIONS=--openssl-legacy-provider
+npm run build
+```
+
+2. Si no tienes `node` instalado en el host, `deploy.sh` puede ejecutar la compilación dentro de un contenedor `node:18` automáticamente.
+
+Problemas encontrados y soluciones (resumen aplicado en este montaje)
+- Error OpenSSL al ejecutar `npm run build` (ERR_OSSL_EVP_UNSUPPORTED): solución temporal con `NODE_OPTIONS=--openssl-legacy-provider`, ejecución directa con `node --openssl-legacy-provider ...`, o usar Node 18.
+- Si `node` no está disponible localmente, `deploy.sh` usa Docker (`node:18-bullseye`) para ejecutar `npm install` y la compilación.
+- Problema al descargar imágenes Docker por helpers de credenciales: solución con `docker logout`, editar `~/.docker/config.json` (hacer backup) o instalar Node localmente si prefieres evitar tratar credenciales Docker ahora.
+
+Despliegue con Docker Desktop (paso a paso)
+1. Situarse en la raíz del repo:
+
+```bash
+cd /mnt/e/SENA/ejecucion/GUIA\ 9/library_management_system_bibliotecaRionegro
+```
+
+2. Ejecutar el script automático (`deploy.sh`) que hace build y levanta Docker:
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+El script realiza:
+- `npm install` en `frontend/` (si procede).
+- intenta `npm run build` aplicando workarounds; si no hay `node`, hace la build dentro de `node:18` en Docker.
+- `docker compose up -d --build` para levantar nginx y montar `frontend/build`.
+- ejecuta `./check.sh` para verificar HTTP 200.
+
+3. Ver manualmente el estado del contenedor y logs:
+
+```bash
+docker compose ps
+docker compose logs -f
+```
+
+4. Abrir en el navegador: `http://localhost:8080`.
+
+Ficheros importantes y su función
+- `docker-compose.yml`: define el servicio `web` (nginx) y el volumen que monta el `build`.
+- `deploy.sh`: automatiza build + docker compose.
+- `check.sh`: script de verificación HTTP.
+
+Capturas y evidencias (qué capturar y dónde guardarlas)
+- Crear la carpeta para capturas:
+
+```bash
+mkdir -p deploy/report/screenshots
+```
+
+- Capturas sugeridas (nombres de archivo):
+	- `01_docker_version.png`: salida de `docker --version`.
+	- `02_frontend_build_tree.png`: árbol `frontend/build` mostrando `index.html` y `static/`.
+	- `03_deploy_sh_output.png`: terminal con la salida de `./deploy.sh` (build + docker compose up).
+	- `04_check_sh_ok.png`: salida del script `./check.sh` con `OK`.
+	- `05_browser_home.png`: vista del navegador con `http://localhost:8080` mostrando la web.
+
+- Para incrustar capturas en el informe (Markdown):
+
+```markdown
+![Docker version](deploy/report/screenshots/01_docker_version.png)
+![Build tree](deploy/report/screenshots/02_frontend_build_tree.png)
+![Deploy output](deploy/report/screenshots/03_deploy_sh_output.png)
+![Check OK](deploy/report/screenshots/04_check_sh_ok.png)
+![Browser view](deploy/report/screenshots/05_browser_home.png)
+```
+
+Comandos útiles de validación
+
+```bash
+# Validar docker-compose
+docker compose config
+
+# Ver contenedores
+docker compose ps
+
+# Logs
+docker compose logs -f
+
+# Verificar HTTP
+./check.sh
+```
+
+Recomendaciones finales y mejoras sugeridas
+- Añadir un `Dockerfile` multi-stage que haga la build del `frontend` y copie el resultado en una imagen `nginx` final. Esto permite distribuir una sola imagen que ya contiene el build (más adecuada para producción y CI).
+- Añadir `.nvmrc` con `18` para el equipo de desarrollo y documentar la instalación de `nvm` en el README.
+- Incluir en la entrega las capturas y un `report/README_REPORT.md` que describa cada una.
+
+Acciones que puedo realizar ahora si lo deseas
+- a) Crear un `Dockerfile` multi-stage y un `Makefile` con `make build` / `make deploy`.
+- b) Añadir un `.nvmrc` con `18` y documentar su uso en el README.
+- c) Crear la carpeta `deploy/report/screenshots/` con placeholders PNG (archivos vacíos) para que subas las capturas.
+
+---
+
+Informe generado el 16-11-2025 para la práctica: despliegue local con Docker Desktop.
 
 
 Problema conocido con Node.js >=17 / OpenSSL 3
