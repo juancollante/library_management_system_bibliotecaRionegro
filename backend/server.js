@@ -15,7 +15,8 @@ import notificationRoutes from "./routes/notifications.js";
 /* App Config */
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 4000;
+// Use the PORT provided by the environment (Fly sets this) and default to 5000
+const port = process.env.PORT || 5000;
 
 /* Middlewares */
 app.use(express.json());
@@ -50,6 +51,7 @@ app.get("/", (req, res) => {
 });
 
 /* Port Listening In */
-app.listen(port, () => {
-  console.log(`Server is running in PORT ${port}`);
+// Bind explicitly to 0.0.0.0 so the process is reachable from the platform proxy
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server is running on port ${port}`);
 });
