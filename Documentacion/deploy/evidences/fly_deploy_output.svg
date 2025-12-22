@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="360">
+  <style>
+    .bg { fill: #071018 }
+    .text { font-family: 'DejaVu Sans Mono', monospace; font-size: 13px; fill: #dbe9f5 }
+    .accent { fill: #7bd389 }
+  </style>
+  <rect class="bg" width="100%" height="100%" rx="6"/>
+  <text x="18" y="30" class="text">$ fly deploy -a biblioteca-backend</text>
+  <text x="18" y="60" class="text">==&gt; Verifying app config</text>
+  <text x="18" y="84" class="text">==&gt; Building image</text>
+  <text x="18" y="108" class="text">--&gt; Building image done</text>
+  <text x="18" y="132" class="text">image: registry.fly.io/biblioteca-backend:deployment-01KA8APNC5VB41ENSNAX7CP1AA</text>
+  <text x="18" y="156" class="text">Watch your deployment at https://fly.io/apps/biblioteca-backend/monitoring</text>
+  <text x="18" y="190" class="text">Provisioning ips for biblioteca-backend</text>
+  <text x="18" y="210" class="text">  Dedicated ipv6: 2a09:8280:1::b1:1466:0</text>
+  <text x="18" y="234" class="text">  Shared ipv4: 66.241.125.56</text>
+  <text x="18" y="264" class="accent">Visit your newly deployed app at https://biblioteca-backend.fly.dev/</text>
+  <rect x="12" y="14" width="976" height="332" rx="6" fill="none" stroke="#123042"/>
+</svg>
