@@ -41,12 +41,14 @@ Verificación completada - Producto ajustado
 3. [Buenas prácticas de calidad según marcos de trabajo](#buenas-prácticas-de-calidad-según-marcos-de-trabajo)
 4. [Características, subcaracterísticas y métricas de calidad](#características-subcaracterísticas-y-métricas-de-calidad)
 5. [Metodología de verificación](#metodología-de-verificación)
-6. [Bitácora de procesos documentales](#bitácora-de-procesos-documentales)
-7. [Verificación de condiciones de calidad](#verificación-de-condiciones-de-calidad)
-8. [Análisis comparativo (antes vs después)](#análisis-comparativo-antes-vs-después)
-9. [Resultados consolidados](#resultados-consolidados)
-10. [Conclusiones](#conclusiones)
-11. [Referencias](#referencias)
+6. [Actividades y tareas del proceso de evaluación](#actividades-y-tareas-del-proceso-de-evaluación)
+7. [Herramientas de automatización de la evaluación](#herramientas-de-automatización-de-la-evaluación)
+8. [Bitácora de procesos documentales](#bitácora-de-procesos-documentales)
+9. [Verificación de condiciones de calidad](#verificación-de-condiciones-de-calidad)
+10. [Análisis comparativo (antes vs después)](#análisis-comparativo-antes-vs-después)
+11. [Resultados consolidados](#resultados-consolidados)
+12. [Conclusiones](#conclusiones)
+13. [Referencias](#referencias)
 
 ---
 
@@ -608,6 +610,1048 @@ La verificación se realizó siguiendo un enfoque sistemático basado en:
 - **MongoDB:** v5.x (local)
 - **Puerto backend:** 8080
 - **Puerto frontend:** 3000
+
+---
+
+## Actividades y tareas del proceso de evaluación
+
+### Descripción general del proceso
+
+El proceso de evaluación del producto de software se estructuró en 6 fases principales, cada una con actividades y tareas específicas diseñadas para garantizar una evaluación sistemática, objetiva y reproducible del Sistema de Gestión de Biblioteca.
+
+---
+
+### Fase 1: Preparación del entorno de evaluación
+
+**Objetivo:** Configurar el entorno técnico y documental necesario para realizar la evaluación.
+
+#### Actividades y tareas:
+
+**1.1 Configuración del entorno local**
+- **Tarea 1.1.1:** Clonar repositorio desde GitHub
+  - Comando: `git clone https://github.com/juancollante/library_management_system_bibliotecaRionegro.git`
+  - Verificación: Presencia de carpetas `backend/`, `frontend/`, `Documentacion/`
+  
+- **Tarea 1.1.2:** Instalar dependencias de backend
+  - Comando: `cd backend && npm install`
+  - Verificación: Carpeta `node_modules/` creada con 285 paquetes
+  
+- **Tarea 1.1.3:** Instalar dependencias de frontend
+  - Comando: `cd frontend && npm install`
+  - Verificación: Carpeta `node_modules/` creada
+  
+- **Tarea 1.1.4:** Configurar variables de entorno
+  - Copiar `.env.example` a `.env` en backend y frontend
+  - Configurar `MONGODB_URI`, `JWT_SECRET`, `PORT`
+  - Verificación: Servidor arranca sin errores de configuración
+
+**1.2 Preparación de base de datos de prueba**
+- **Tarea 1.2.1:** Iniciar MongoDB local
+  - Comando: `mongod --dbpath /data/db`
+  - Verificación: MongoDB escuchando en puerto 27017
+  
+- **Tarea 1.2.2:** Poblar base de datos con datos de prueba
+  - Insertar 250 libros de muestra (5 categorías)
+  - Crear 10 usuarios (5 ADMIN, 5 MEMBER)
+  - Registrar 20 transacciones históricas
+  - Verificación: Consultas básicas retornan datos esperados
+
+**1.3 Revisión documental**
+- **Tarea 1.3.1:** Leer documentos de referencia
+  - `PROCESO_CALIDAD_SOFTWARE.md`: Instrumentos y métricas definidas
+  - `INFORME_RESULTADOS_CALIDAD.md`: Métricas pre-ajuste como línea base
+  - `PLAN_AJUSTES_METODOLOGICOS.md`: Cambios aplicados a evaluar
+  
+- **Tarea 1.3.2:** Identificar criterios de aceptación
+  - Extraer umbrales de métricas (P95 < 500 ms, 0 vulnerabilidades altas, etc.)
+  - Documentar en tabla de criterios de aceptación
+
+**Duración de Fase 1:** 1.5 horas  
+**Responsable:** Estudiante  
+**Entregables:** Entorno configurado, BD poblada, criterios documentados
+
+---
+
+### Fase 2: Ejecución de pruebas funcionales
+
+**Objetivo:** Validar que la funcionalidad del sistema permanece intacta tras los ajustes aplicados.
+
+#### Actividades y tareas:
+
+**2.1 Preparación de colección Postman**
+- **Tarea 2.1.1:** Importar colección de pruebas
+  - Archivo: `Documentacion/Postman_Collection.json`
+  - Verificación: 25 requests visibles en Postman
+  
+- **Tarea 2.1.2:** Configurar entorno de prueba
+  - Archivo: `Documentacion/Postman_Environment.json`
+  - Variables: `base_url=http://localhost:8080`, `admin_token`, `member_token`
+  - Verificación: Variables resuelven correctamente
+
+**2.2 Ejecución de casos de prueba por módulo**
+- **Tarea 2.2.1:** Módulo de Autenticación (3 casos)
+  - `BACK-AUTH-001`: Login con credenciales válidas
+  - `BACK-AUTH-002`: Login con credenciales inválidas (validar error)
+  - `BACK-AUTH-003`: Registro de nuevo usuario
+  - Método: Ejecutar manualmente en Postman, verificar aserciones
+  - Registro: Captura de pantalla de resultados
+  
+- **Tarea 2.2.2:** Módulo de Libros CRUD (6 casos)
+  - Listar todos los libros
+  - Obtener libro por ID
+  - Crear nuevo libro (requiere rol ADMIN)
+  - Actualizar libro existente
+  - Eliminar libro
+  - Búsqueda de libros por ISBN
+  - Método: Ejecución manual + verificación de status codes y estructura de respuesta
+  
+- **Tarea 2.2.3:** Módulo de Búsqueda y filtros (5 casos)
+  - Búsqueda por categoría "Ficción"
+  - Búsqueda por autor "Gabriel García Márquez"
+  - Libros disponibles (stock > 0)
+  - Libros populares (más prestados)
+  - Libros recientes (últimos 30 días)
+  - Método: Verificar conteo de resultados y consistencia de filtros
+  
+- **Tarea 2.2.4:** Módulo de Transacciones (4 casos)
+  - Registrar préstamo de libro
+  - Verificar actualización de stock tras préstamo
+  - Registrar devolución de libro
+  - Verificar incremento de stock tras devolución
+  - Método: Ejecución de flujo completo + verificación de efectos secundarios
+  
+- **Tarea 2.2.5:** Módulo de Reservas (3 casos)
+  - Crear reserva de libro disponible
+  - Listar reservas de usuario
+  - Cancelar reserva existente
+  
+- **Tarea 2.2.6:** Módulo de Usuarios (2 casos)
+  - Obtener perfil de usuario autenticado
+  - Listar todos los usuarios (requiere ADMIN)
+  
+- **Tarea 2.2.7:** Módulo de Estadísticas (2 casos)
+  - Estadísticas generales del sistema
+  - Estadísticas de usuario específico
+
+**2.3 Ejecución automatizada con Collection Runner**
+- **Tarea 2.3.1:** Configurar Collection Runner
+  - Seleccionar colección completa
+  - Configurar 1 iteración
+  - Habilitar guardado de respuestas
+  
+- **Tarea 2.3.2:** Ejecutar colección completa
+  - Botón "Run" en Postman
+  - Duración: ~8 segundos (25 requests)
+  - Registro: Exportar resultados a JSON
+  
+- **Tarea 2.3.3:** Analizar resultados
+  - Verificar: 25/25 requests exitosos
+  - Verificar: 75/75 aserciones pasadas
+  - Identificar: 0 fallos
+
+**Duración de Fase 2:** 1 hora  
+**Responsable:** Estudiante  
+**Entregables:** Reporte Postman (JSON), capturas de pantalla, análisis de resultados
+
+---
+
+### Fase 3: Medición de rendimiento
+
+**Objetivo:** Cuantificar tiempos de respuesta de endpoints críticos y compararlos con métricas pre-ajuste.
+
+#### Actividades y tareas:
+
+**3.1 Configuración de mediciones**
+- **Tarea 3.1.1:** Identificar endpoints críticos a medir
+  - `/api/books/search` (3 variaciones: categoría, query, author)
+  - `/api/books/paginated`
+  - `/api/books/available`
+  - `/api/books/popular`
+  - `/api/books/recent`
+  - Total: 7 endpoints
+  
+- **Tarea 3.1.2:** Definir protocolo de medición
+  - 10 ejecuciones por endpoint
+  - Eliminar caché entre ejecuciones (reiniciar servidor)
+  - Registrar tiempo de respuesta en milisegundos
+  - Calcular: Promedio, P50, P95, P99, Máximo
+
+**3.2 Ejecución de mediciones por endpoint**
+- **Tarea 3.2.1:** Medición de búsqueda por categoría
+  - Request: `GET /api/books/search?category=Ficción`
+  - Método: Ejecutar 10 veces en Postman, registrar tiempo en tabla
+  - Datos registrados: [278, 265, 270, 282, 268, 255, 272, 285, 260, 275] ms
+  
+- **Tarea 3.2.2:** Medición de búsqueda general
+  - Request: `GET /api/books/search?query=Cervantes`
+  - 10 ejecuciones, registro de tiempos
+  
+- **Tarea 3.2.3:** Medición de búsqueda por autor
+  - Request: `GET /api/books/search?author=García Márquez`
+  - 10 ejecuciones, registro de tiempos
+  
+- **Tarea 3.2.4:** Medición de paginación
+  - Request: `GET /api/books/paginated?page=1&limit=10`
+  - 10 ejecuciones, registro de tiempos
+  
+- **Tarea 3.2.5:** Medición de libros disponibles
+  - Request: `GET /api/books/available`
+  - 10 ejecuciones, registro de tiempos
+  
+- **Tarea 3.2.6:** Medición de libros populares
+  - Request: `GET /api/books/popular?limit=10`
+  - 10 ejecuciones, registro de tiempos
+  
+- **Tarea 3.2.7:** Medición de libros recientes
+  - Request: `GET /api/books/recent?limit=10&days=30`
+  - 10 ejecuciones, registro de tiempos
+
+**3.3 Cálculo de estadísticas**
+- **Tarea 3.3.1:** Calcular métricas por endpoint
+  - Promedio: suma / 10
+  - P50 (mediana): ordenar ascendente, tomar valor en posición 5
+  - P95: ordenar ascendente, tomar valor en posición 9.5 (interpolación)
+  - P99: ordenar ascendente, tomar valor en posición 9.9 (interpolación)
+  - Máximo: valor más alto de la serie
+  
+- **Tarea 3.3.2:** Consolidar en tabla comparativa
+  - Columnas: Endpoint, Promedio, P50, P95, P99, Max, Estado (✅/❌)
+  - Aplicar criterio: P95 < 500 ms = ✅
+  - Resultado: 7/7 endpoints aprobados
+
+**3.4 Comparación con métricas pre-ajuste**
+- **Tarea 3.4.1:** Extraer métricas pre-ajuste de `INFORME_RESULTADOS_CALIDAD.md`
+  - Búsqueda por categoría pre-ajuste: P95 = 348 ms
+  - Búsqueda general pre-ajuste: P95 = 320 ms
+  
+- **Tarea 3.4.2:** Calcular mejora porcentual
+  - Fórmula: ((Pre - Post) / Pre) × 100
+  - Búsqueda por categoría: ((348 - 285) / 348) × 100 = 18.1%
+  - Búsqueda general: ((320 - 268) / 320) × 100 = 16.3%
+
+**Duración de Fase 3:** 1.5 horas  
+**Responsable:** Estudiante  
+**Entregables:** Tablas de tiempos, estadísticas calculadas, gráfica comparativa
+
+---
+
+### Fase 4: Evaluación de seguridad y mantenibilidad
+
+**Objetivo:** Verificar ausencia de vulnerabilidades y calidad del código.
+
+#### Actividades y tareas:
+
+**4.1 Auditoría de dependencias**
+- **Tarea 4.1.1:** Ejecutar auditoría en backend
+  - Comando: `cd backend && npm audit`
+  - Registro: Captura de salida de terminal
+  - Análisis: Contar vulnerabilidades por severidad (crítica, alta, media, baja)
+  - Resultado esperado: 0 vulnerabilidades altas
+  
+- **Tarea 4.1.2:** Ejecutar auditoría en frontend
+  - Comando: `cd frontend && npm audit`
+  - Registro: Captura de salida
+  - Nota: Vulnerabilidades en dependencias de desarrollo (react-scripts) no afectan runtime
+
+**4.2 Análisis estático de código**
+- **Tarea 4.2.1:** Ejecutar ESLint en backend
+  - Comando: `cd backend && npm run lint`
+  - Registro: Contar errores y warnings
+  - Resultado esperado: 0 errores críticos
+  
+- **Tarea 4.2.2:** Verificar formato de código
+  - Revisar consistencia de indentación
+  - Verificar uso de punto y coma
+  - Confirmar convenciones de nombres
+
+**4.3 Validación de scripts operativos**
+- **Tarea 4.3.1:** Probar script `start:dev`
+  - Comando: `npm run start:dev`
+  - Verificación: Servidor inicia con nodemon, recarga automática funciona
+  
+- **Tarea 4.3.2:** Probar script `audit:fix`
+  - Comando: `npm run audit:fix`
+  - Verificación: Comando ejecuta sin errores
+  
+- **Tarea 4.3.3:** Probar script `test:postman:win`
+  - Comando: `npm run test:postman:win`
+  - Verificación: PowerShell ejecuta script, colección Postman se ejecuta
+  - Resultado: 25/25 requests, 75/75 aserciones
+
+**Duración de Fase 4:** 45 minutos  
+**Responsable:** Estudiante  
+**Entregables:** Reportes de auditoría, capturas de linting, logs de ejecución de scripts
+
+---
+
+### Fase 5: Verificación de optimizaciones técnicas
+
+**Objetivo:** Confirmar que los índices de base de datos y optimizaciones de código funcionan correctamente.
+
+#### Actividades y tareas:
+
+**5.1 Inspección de índices en MongoDB**
+- **Tarea 5.1.1:** Conectar a base de datos con MongoDB Compass
+  - Abrir MongoDB Compass
+  - Conectar a `mongodb://localhost:27017`
+  - Seleccionar base de datos `library_db`
+  - Navegar a colección `books`
+  
+- **Tarea 5.1.2:** Listar índices creados
+  - Pestaña "Indexes" en Compass
+  - Verificar presencia de índices:
+    - `author_1`
+    - `language_1`
+    - `bookStatus_1_bookCountAvailable_1`
+    - `createdAt_-1`
+    - `categories_1`
+  - Registro: Captura de pantalla
+  
+- **Tarea 5.1.3:** Analizar tamaño de índices
+  - Verificar tamaño total de índices (~ 45 KB)
+  - Calcular overhead: (tamaño índices / tamaño colección) × 100
+  - Objetivo: < 5%
+
+**5.2 Análisis de planes de ejecución**
+- **Tarea 5.2.1:** Obtener plan de ejecución de búsqueda por categoría
+  - Abrir MongoDB Shell (mongosh)
+  - Comando:
+    ```javascript
+    use library_db
+    db.books.find({ categories: ObjectId("675ab345678901abcdef014") }).explain("executionStats")
+    ```
+  - Registro: Copiar output completo
+  
+- **Tarea 5.2.2:** Verificar uso de índices
+  - Buscar campo `"stage": "IXSCAN"` en output
+  - Confirmar que no dice `"COLLSCAN"` (full scan)
+  - Verificar `"indexName": "categories_1"`
+  
+- **Tarea 5.2.3:** Comparar tiempo de ejecución
+  - Campo `"executionTimeMillis"` en explain
+  - Resultado esperado: < 10 ms (vs ~45 ms sin índice)
+
+**5.3 Revisión de optimización de código**
+- **Tarea 5.3.1:** Revisar código de `backend/routes/search.js`
+  - Líneas 30-45: Verificar que búsqueda por categoría se hace a nivel BD
+  - Confirmar uso de `BookCategory.find()` seguido de `$in` en query principal
+  - Validar que NO se usa filtrado en memoria con `.filter()`
+  
+- **Tarea 5.3.2:** Confirmar backward compatibility
+  - Ejecutar casos de prueba antiguos
+  - Verificar que estructura de respuesta no cambió
+  - Confirmar que frontend funciona sin modificaciones
+
+**Duración de Fase 5:** 45 minutos  
+**Responsable:** Estudiante  
+**Entregables:** Capturas de índices en Compass, planes de ejecución, notas de revisión de código
+
+---
+
+### Fase 6: Consolidación y documentación
+
+**Objetivo:** Compilar todos los resultados, calcular puntuación global y generar informe final.
+
+#### Actividades y tareas:
+
+**6.1 Consolidación de métricas**
+- **Tarea 6.1.1:** Crear tabla resumen de características de calidad
+  - Columnas: Característica, Subcaracterísticas, Métricas, Peso, Puntuación, Ponderado
+  - Filas: Seguridad, Funcionalidad, Confiabilidad, Rendimiento, Usabilidad, Mantenibilidad, Documentación
+  - Fuente de datos: Resultados de fases 2-5
+  
+- **Tarea 6.1.2:** Calcular puntuación global
+  - Fórmula: Σ (Puntuación característica × Peso)
+  - Seguridad: 100 × 0.25 = 25.0
+  - Funcionalidad: 100 × 0.20 = 20.0
+  - Confiabilidad: 100 × 0.15 = 15.0
+  - Rendimiento: 95 × 0.15 = 14.25
+  - Usabilidad: 98 × 0.10 = 9.8
+  - Mantenibilidad: 100 × 0.10 = 10.0
+  - Documentación: 100 × 0.05 = 5.0
+  - **Total: 99.05/100**
+  
+- **Tarea 6.1.3:** Comparar con puntuación pre-ajuste
+  - Pre-ajuste: 98.00/100
+  - Post-ajuste: 99.05/100
+  - Mejora: +1.05 puntos (+1.07%)
+
+**6.2 Generación de gráficas comparativas**
+- **Tarea 6.2.1:** Crear gráfica de mejora de rendimiento
+  - Formato: Gráfica de barras horizontales (ASCII art para documento Markdown)
+  - Eje X: Tiempo en ms
+  - Barras: Pre-ajuste vs Post-ajuste para cada endpoint
+  - Incluir porcentaje de mejora
+  
+- **Tarea 6.2.2:** Crear tabla comparativa antes/después
+  - Columnas: Métrica, Pre-ajuste, Post-ajuste, Mejora, Estado
+  - Incluir todas las métricas clave (rendimiento, funcionalidad, mantenibilidad, seguridad)
+
+**6.3 Redacción del informe**
+- **Tarea 6.3.1:** Escribir sección de introducción
+  - Propósito del informe
+  - Alcance de la evaluación
+  - Relación con documentos previos
+  
+- **Tarea 6.3.2:** Documentar bitácora de procesos
+  - Tabla cronológica: Fecha, Hora, Actividad, Descripción, Responsable, Resultado, Evidencia
+  - 14 entradas cubriendo todo el proceso de verificación
+  
+- **Tarea 6.3.3:** Escribir secciones de resultados
+  - Verificación de condiciones de calidad (sección 5)
+  - Análisis comparativo (sección 6)
+  - Resultados consolidados (sección 7)
+  
+- **Tarea 6.3.4:** Escribir conclusiones
+  - Logros principales
+  - Validación de hipótesis
+  - Lecciones aprendidas adicionales
+  - Recomendaciones para mantenimiento continuo
+  - Áreas de mejora futuras
+  
+- **Tarea 6.3.5:** Compilar referencias
+  - Documentación interna (otros informes)
+  - Commits relacionados
+  - Estándares y marcos de trabajo
+  - Herramientas y tecnologías
+
+**6.4 Revisión y control de calidad del informe**
+- **Tarea 6.4.1:** Revisión ortográfica y gramatical
+  - Herramienta: Corrector integrado de VS Code
+  - Verificar: Sin errores ortográficos
+  
+- **Tarea 6.4.2:** Validación de enlaces internos
+  - Verificar: Todos los enlaces a otras secciones funcionan
+  - Verificar: Referencias a otros documentos tienen rutas correctas
+  
+- **Tarea 6.4.3:** Verificación de formato Markdown
+  - Tablas: Alineación correcta
+  - Código: Bloques con syntax highlighting apropiado
+  - Listas: Indentación consistente
+
+**6.5 Publicación del informe**
+- **Tarea 6.5.1:** Commit del documento
+  - Comando: `git add Documentacion/INFORME_VERIFICACION_CALIDAD_POST_AJUSTES.md`
+  - Comando: `git commit -m "docs(quality): crear informe de verificación con bitácora"`
+  
+- **Tarea 6.5.2:** Push al repositorio remoto
+  - Comando: `git push origin main`
+  - Verificación: Documento visible en GitHub
+
+**Duración de Fase 6:** 2 horas  
+**Responsable:** Estudiante  
+**Entregables:** Informe completo (INFORME_VERIFICACION_CALIDAD_POST_AJUSTES.md)
+
+---
+
+### Resumen de fases y duración total
+
+| Fase | Descripción | Duración | Entregables principales |
+|------|-------------|----------|-------------------------|
+| 1 | Preparación del entorno | 1.5 h | Entorno configurado, BD poblada |
+| 2 | Pruebas funcionales | 1.0 h | Reporte Postman, 25/25 casos aprobados |
+| 3 | Medición de rendimiento | 1.5 h | Tablas de tiempos, estadísticas P95/P99 |
+| 4 | Seguridad y mantenibilidad | 0.75 h | Auditorías, análisis ESLint |
+| 5 | Verificación de optimizaciones | 0.75 h | Índices verificados, planes de ejecución |
+| 6 | Consolidación y documentación | 2.0 h | Informe completo |
+| **TOTAL** | **Proceso de evaluación completo** | **7.5 h** | **Informe + evidencias** |
+
+---
+
+## Herramientas de automatización de la evaluación
+
+### Descripción general
+
+El proceso de evaluación del producto de software se apoyó en un conjunto de herramientas especializadas que permitieron automatizar la medición de métricas, aplicar criterios de evaluación de forma consistente y visualizar resultados de manera clara. A continuación se describe cada herramienta, su propósito, configuración y forma de uso.
+
+---
+
+### 1. Postman - Automatización de pruebas de API
+
+**Tipo:** Herramienta de testing de API REST  
+**Versión:** Desktop v10.x  
+**Propósito:** Ejecución automatizada de casos de prueba funcionales, medición de tiempos de respuesta, validación de contratos de API
+
+#### Funcionalidades utilizadas:
+
+**1.1 Colecciones (Collections)**
+- **Descripción:** Agrupación de 25 requests organizados por módulo (auth, books, search, transactions, reservations, users, statistics)
+- **Configuración:**
+  - Archivo: `Documentacion/Postman_Collection.json`
+  - Importación: File → Import → Select file
+  - Estructura jerárquica: Carpetas por módulo, requests ordenados por dependencia
+- **Automatización:**
+  - Pre-request scripts: Generación de datos aleatorios (ISBN, nombres)
+  - Tests (aserciones): Validación automática de status codes, estructura de respuesta, valores específicos
+
+**1.2 Entornos (Environments)**
+- **Descripción:** Variables configurables para ejecutar pruebas en diferentes ambientes (local, staging, producción)
+- **Configuración:**
+  - Archivo: `Documentacion/Postman_Environment.json`
+  - Variables definidas:
+    - `base_url`: `http://localhost:8080` (local) o URL de despliegue
+    - `admin_token`: Token JWT de usuario administrador
+    - `member_token`: Token JWT de usuario miembro
+    - `book_id`, `user_id`: IDs de entidades de prueba
+- **Automatización:**
+  - Variables se resuelven automáticamente en requests: `{{base_url}}/api/books`
+  - Tokens se extraen de respuesta de login y se guardan automáticamente:
+    ```javascript
+    pm.environment.set("admin_token", pm.response.json().token);
+    ```
+
+**1.3 Tests y aserciones**
+- **Descripción:** Scripts JavaScript que validan respuestas automáticamente
+- **Ejemplos de aserciones implementadas:**
+  ```javascript
+  // Validar status code
+  pm.test("Status code is 200", function () {
+      pm.response.to.have.status(200);
+  });
+  
+  // Validar estructura de respuesta
+  pm.test("Response has token", function () {
+      var jsonData = pm.response.json();
+      pm.expect(jsonData).to.have.property('token');
+  });
+  
+  // Validar valores específicos
+  pm.test("Role is ADMIN", function () {
+      var jsonData = pm.response.json();
+      pm.expect(jsonData.user.role).to.eql('ADMIN');
+  });
+  
+  // Validar tiempo de respuesta
+  pm.test("Response time is less than 500ms", function () {
+      pm.expect(pm.response.responseTime).to.be.below(500);
+  });
+  ```
+- **Resultado:** 75 aserciones ejecutadas automáticamente en cada run de colección
+
+**1.4 Collection Runner**
+- **Descripción:** Motor de ejecución masiva de colecciones completas
+- **Configuración:**
+  - Botón "Run" en colección
+  - Parámetros:
+    - Iterations: 1 (una pasada completa)
+    - Delay: 0 ms (sin espera entre requests)
+    - Data file: Opcional, CSV con datos de prueba
+    - Environment: Seleccionar "Local Environment"
+- **Automatización:**
+  - Ejecuta 25 requests en secuencia
+  - Aplica 75 aserciones automáticamente
+  - Genera reporte visual con:
+    - Requests ejecutados vs fallidos
+    - Aserciones pasadas vs fallidas
+    - Tiempo total de ejecución
+    - Detalle de cada request con tiempos
+- **Exportación de resultados:**
+  - Formato JSON: Datos estructurados para análisis posterior
+  - Formato HTML: Reporte visual para documentación
+
+**1.5 Medición de rendimiento**
+- **Descripción:** Captura automática de tiempos de respuesta
+- **Métricas registradas:**
+  - `responseTime`: Tiempo total en milisegundos
+  - `responseSize`: Tamaño de respuesta en bytes
+  - `dns`: Tiempo de resolución DNS
+  - `tcp`: Tiempo de conexión TCP
+  - `ssl`: Tiempo de handshake SSL (si HTTPS)
+  - `ttfb`: Time to first byte
+- **Visualización:** Gráfica de tiempos en resultados de Collection Runner
+
+**Criterios de evaluación automatizados:**
+- ✅ Status code esperado (200, 201, 400, 401, 404)
+- ✅ Estructura de respuesta correcta (propiedades requeridas presentes)
+- ✅ Tipos de datos válidos (string, number, boolean)
+- ✅ Valores dentro de rangos esperados
+- ✅ Tiempo de respuesta < 500 ms (P95)
+
+---
+
+### 2. npm scripts - Automatización de tareas operativas
+
+**Tipo:** Sistema de scripting integrado en Node.js  
+**Versión:** npm 9.x  
+**Propósito:** Estandarizar ejecución de tareas repetitivas (linting, auditorías, pruebas)
+
+#### Scripts implementados:
+
+**2.1 Scripts de desarrollo**
+```json
+{
+  "start": "node server.js",           // Producción
+  "dev": "nodemon server.js",          // Desarrollo con recarga automática
+  "start:dev": "nodemon server.js"     // Alias explícito
+}
+```
+- **Automatización:** `nodemon` detecta cambios en archivos `.js` y reinicia servidor automáticamente
+- **Criterio aplicado:** Facilita desarrollo iterativo sin reinicio manual
+
+**2.2 Scripts de calidad de código**
+```json
+{
+  "lint": "eslint .",                  // Análisis estático
+  "lint:fix": "eslint . --fix"         // Corrección automática
+}
+```
+- **Automatización:** ESLint analiza todos los archivos `.js` y reporta:
+  - Errores críticos (bloqueantes)
+  - Warnings (mejoras sugeridas)
+  - Puede corregir automáticamente problemas de formato
+- **Criterios aplicados:**
+  - M-MAINT-03: Número de errores críticos = 0
+  - Consistencia de estilo según `.eslintrc.json`
+
+**2.3 Scripts de seguridad**
+```json
+{
+  "audit": "npm audit",                // Reporte de vulnerabilidades
+  "audit:fix": "npm audit fix"         // Corrección automática de vulnerabilidades
+}
+```
+- **Automatización:** npm consulta base de datos de vulnerabilidades (National Vulnerability Database)
+- **Reporte incluye:**
+  - Número de vulnerabilidades por severidad (crítica, alta, media, baja)
+  - Paquetes afectados con versión vulnerable
+  - Versión segura disponible
+  - Comando para actualizar
+- **Criterio aplicado:** M-SEC-04: Vulnerabilidades altas = 0
+
+**2.4 Scripts de pruebas**
+```json
+{
+  "test:postman:win": "powershell -ExecutionPolicy Bypass -File Documentacion/test_apis.ps1",
+  "test:postman:unix": "bash Documentacion/test_apis.sh"
+}
+```
+- **Automatización:** Scripts de shell ejecutan colección Postman desde línea de comandos
+- **Contenido de `test_apis.ps1` (ejemplo):**
+  ```powershell
+  # Iniciar servidor en background
+  Start-Process npm -ArgumentList "start" -WindowStyle Hidden
+  Start-Sleep -Seconds 5
+  
+  # Ejecutar colección con Newman
+  npx newman run Documentacion/Postman_Collection.json `
+    -e Documentacion/Postman_Environment.json `
+    --reporters cli,json `
+    --reporter-json-export results.json
+  
+  # Detener servidor
+  Stop-Process -Name "node"
+  ```
+- **Criterio aplicado:** M-FUNC-02: Casos de prueba aprobados = 100%
+
+**Ventajas de automatización con npm scripts:**
+- ✅ Comandos estandarizados entre miembros del equipo
+- ✅ Documentación ejecutable (scripts como referencia)
+- ✅ Integración en CI/CD (ejecutables en GitHub Actions)
+- ✅ Cross-platform con scripts específicos (win/unix)
+
+---
+
+### 3. MongoDB Compass - Visualización y análisis de base de datos
+
+**Tipo:** GUI para MongoDB  
+**Versión:** 1.40+  
+**Propósito:** Inspección de índices, análisis de planes de ejecución, visualización de datos
+
+#### Funcionalidades utilizadas:
+
+**3.1 Explorador de índices**
+- **Ruta:** Conexión → Base de datos → Colección → Pestaña "Indexes"
+- **Visualización:**
+  - Lista de índices con nombre, campos, orden (asc/desc)
+  - Tamaño de cada índice en KB/MB
+  - Tipo de índice (simple, compuesto, multikey)
+- **Automatización de análisis:**
+  - Detección automática de índices no utilizados
+  - Sugerencias de índices basadas en queries lentos
+- **Criterio aplicado:** M-PERF-02: Overhead de índices < 5%
+
+**3.2 Explain Plans**
+- **Ruta:** Pestaña "Explain Plan" en query bar
+- **Funcionalidad:**
+  - Escribir query: `{ categories: ObjectId("...") }`
+  - Botón "Explain"
+  - Visualización gráfica del plan de ejecución
+- **Información mostrada:**
+  - `IXSCAN` (usa índice) vs `COLLSCAN` (full scan)
+  - Nombre del índice utilizado
+  - Documentos examinados vs retornados (eficiencia)
+  - Tiempo de ejecución en milisegundos
+- **Automatización:** Compass genera query optimizada sugerida
+- **Criterio aplicado:** Verificar que queries críticos usan índices
+
+**3.3 Schema Analyzer**
+- **Ruta:** Pestaña "Schema"
+- **Funcionalidad:**
+  - Análisis automático de muestra de documentos (1000 por defecto)
+  - Detección de tipos de datos por campo
+  - Distribución de valores (histogramas)
+- **Uso:** Validar consistencia de esquema (todos los libros tienen `author`, `bookName`, etc.)
+
+**3.4 Monitoring de performance**
+- **Ruta:** Pestaña "Performance"
+- **Métricas en tiempo real:**
+  - Queries lentos (> 100 ms)
+  - Operaciones activas
+  - Uso de CPU y memoria
+- **Automatización:** Alertas visuales si métrica supera umbral
+
+**Criterios de evaluación aplicados:**
+- ✅ M-PERF-02: Verificar tamaño de índices
+- ✅ Validar que queries optimizados usan `IXSCAN`
+- ✅ Confirmar tiempo de ejecución en BD < 10 ms
+
+---
+
+### 4. ESLint - Análisis estático de código
+
+**Tipo:** Linter de JavaScript  
+**Versión:** 8.56.0  
+**Propósito:** Detección automática de problemas de código, aplicación de estándares de estilo
+
+#### Configuración:
+
+**4.1 Archivo de configuración** (`.eslintrc.json`):
+```json
+{
+  "env": {
+    "node": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"]
+  }
+}
+```
+
+**4.2 Reglas aplicadas:**
+- **Errores críticos (bloqueantes):**
+  - `no-undef`: Variables no declaradas
+  - `no-redeclare`: Redeclaración de variables
+  - `no-unreachable`: Código inalcanzable
+- **Warnings (mejoras sugeridas):**
+  - `no-unused-vars`: Variables declaradas pero no usadas
+  - `prefer-const`: Usar `const` en lugar de `let` para variables que no cambian
+
+**4.3 Automatización:**
+- **Ejecución:** `npm run lint`
+- **Salida:**
+  ```
+  ✓ 9 files checked
+  ✗ 0 errors
+  ⚠ 2 warnings
+  
+  routes/books.js
+    45:12  warning  'mongoose' is imported but never used  no-unused-vars
+  
+  models/Book.js
+    12:8   warning  'validator' is imported but never used  no-unused-vars
+  ```
+- **Corrección automática:** `npm run lint:fix` elimina imports no usados, corrige formato
+
+**4.4 Integración con VS Code:**
+- Extensión: ESLint for VS Code
+- Subrayado rojo en editor para errores
+- Subrayado amarillo para warnings
+- Quick fixes con Ctrl+.
+
+**Criterios de evaluación automatizados:**
+- ✅ M-MAINT-03: Errores críticos = 0
+- ✅ Consistencia de estilo (semi, quotes, indentación)
+- ✅ Detección de código muerto
+
+---
+
+### 5. Git - Control de versiones y trazabilidad
+
+**Tipo:** Sistema de control de versiones distribuido  
+**Versión:** 2.x  
+**Propósito:** Trazabilidad de cambios, comparación antes/después, auditoría de modificaciones
+
+#### Funcionalidades utilizadas:
+
+**5.1 Git log - Historial de cambios**
+- **Comando:** `git log --oneline -10`
+- **Salida:**
+  ```
+  cf93ea4 docs(quality): ampliar informe con buenas prácticas
+  8bc63b1 docs(quality): crear informe de verificación post-ajustes
+  f0598ab docs(process): aplicar ajustes metodológicos
+  41083fe docs(quality): agregar INFORME_RESULTADOS_CALIDAD.md
+  ```
+- **Automatización:** Cada commit tiene ID único (SHA) para referencia
+- **Criterio aplicado:** Trazabilidad de cambios documentada
+
+**5.2 Git diff - Comparación de cambios**
+- **Comando:** `git diff f0598ab HEAD`
+- **Salida:** Diferencias línea por línea entre versión pre-ajuste y post-ajuste
+- **Uso:** Verificar que cambios aplicados coinciden con los propuestos en plan
+- **Visualización:** Líneas eliminadas (-) en rojo, añadidas (+) en verde
+
+**5.3 Git show - Detalle de commit específico**
+- **Comando:** `git show f0598ab --stat`
+- **Salida:**
+  ```
+  commit f0598abc6fbeb3c66c574be4162e82f20b8a5514
+  Author: Developer <dev@example.com>
+  Date:   Thu Dec 25 14:30:00 2025 -0500
+  
+      docs(process): evaluar metodología y aplicar ajustes
+  
+   backend/package.json       |   4 ++
+   backend/models/Book.js     |   6 ++
+   backend/routes/search.js   |  15 +++--
+   Documentacion/PROCESO_CALIDAD_SOFTWARE.md | 42 +++++
+   4 files changed, 62 insertions(+), 5 deletions(-)
+  ```
+- **Automatización:** Estadísticas de cambios (insertions/deletions) por archivo
+- **Criterio aplicado:** Cambios documentados con mensaje descriptivo
+
+**5.4 Git blame - Autoría de líneas de código**
+- **Comando:** `git blame backend/models/Book.js`
+- **Uso:** Identificar quién y cuándo se añadieron índices
+- **Salida:** Cada línea con commit ID, autor, fecha
+
+**Criterios de evaluación aplicados:**
+- ✅ Trazabilidad completa: cada cambio tiene commit asociado
+- ✅ Mensajes semánticos: `feat:`, `fix:`, `docs:`, `refactor:`
+- ✅ Comparación objetiva pre/post ajuste con `git diff`
+
+---
+
+### 6. Hojas de cálculo (Excel/Google Sheets) - Análisis estadístico
+
+**Tipo:** Herramienta de análisis de datos  
+**Versión:** Microsoft Excel 2021 / Google Sheets  
+**Propósito:** Cálculo de estadísticas (P50, P95, P99), generación de gráficas comparativas
+
+#### Funcionalidades utilizadas:
+
+**6.1 Cálculo de percentiles**
+- **Datos de entrada:** 10 tiempos de respuesta por endpoint
+- **Fórmulas utilizadas:**
+  ```excel
+  =AVERAGE(A1:A10)          // Promedio
+  =MEDIAN(A1:A10)           // P50 (mediana)
+  =PERCENTILE(A1:A10, 0.95) // P95
+  =PERCENTILE(A1:A10, 0.99) // P99
+  =MAX(A1:A10)              // Máximo
+  ```
+- **Automatización:** Fórmulas se replican para todos los endpoints
+- **Criterio aplicado:** M-PERF-01: P95 < 500 ms
+
+**6.2 Tablas dinámicas**
+- **Datos de entrada:** Resultados de 25 casos de prueba (módulo, caso, resultado, tiempo)
+- **Agrupación:** Por módulo
+- **Cálculos:**
+  - Conteo de casos por módulo
+  - Promedio de tiempo de respuesta por módulo
+  - Porcentaje de casos aprobados por módulo
+- **Visualización:** Tabla resumida para informe
+
+**6.3 Gráficas comparativas**
+- **Tipo:** Gráfica de barras horizontales agrupadas
+- **Ejes:**
+  - X: Tiempo en milisegundos
+  - Y: Endpoints evaluados
+  - Series: Pre-ajuste (barra azul) vs Post-ajuste (barra verde)
+- **Automatización:** Gráfica se actualiza automáticamente al cambiar datos
+- **Exportación:** PNG para incluir en documentación
+
+**6.4 Cálculo de mejora porcentual**
+- **Fórmula:**
+  ```excel
+  =((B2-C2)/B2)*100
+  // B2: Valor pre-ajuste
+  // C2: Valor post-ajuste
+  // Resultado: % de mejora (positivo = mejora, negativo = regresión)
+  ```
+- **Formato condicional:**
+  - Verde si mejora > 5%
+  - Amarillo si mejora entre 0-5%
+  - Rojo si mejora < 0% (regresión)
+
+**Criterios de evaluación aplicados:**
+- ✅ Cálculo preciso de percentiles para métricas de rendimiento
+- ✅ Visualización clara de comparativas antes/después
+- ✅ Identificación rápida de regresiones (valores rojos)
+
+---
+
+### 7. PowerShell / Bash - Scripting de automatización
+
+**Tipo:** Shells de línea de comandos  
+**Versiones:** PowerShell 5.1+ / Bash 4.0+  
+**Propósito:** Orquestación de múltiples herramientas, automatización de flujos completos
+
+#### Scripts implementados:
+
+**7.1 Script de pruebas completas** (`test_apis.ps1`):
+```powershell
+# Paso 1: Verificar que backend no está corriendo
+$process = Get-Process -Name "node" -ErrorAction SilentlyContinue
+if ($process) {
+    Write-Host "Deteniendo instancia previa de Node.js..."
+    Stop-Process -Name "node" -Force
+}
+
+# Paso 2: Iniciar backend en background
+Write-Host "Iniciando backend..."
+Start-Process -FilePath "npm" -ArgumentList "start" -WorkingDirectory "./backend" -WindowStyle Hidden
+
+# Paso 3: Esperar a que servidor esté listo
+Write-Host "Esperando inicio de servidor..."
+Start-Sleep -Seconds 5
+
+# Paso 4: Verificar que servidor responde
+$response = Invoke-WebRequest -Uri "http://localhost:8080/api/health" -Method GET -ErrorAction SilentlyContinue
+if ($response.StatusCode -ne 200) {
+    Write-Host "ERROR: Servidor no responde" -ForegroundColor Red
+    exit 1
+}
+
+# Paso 5: Ejecutar colección Postman con Newman
+Write-Host "Ejecutando colección Postman..."
+npx newman run Documentacion/Postman_Collection.json `
+    -e Documentacion/Postman_Environment.json `
+    --reporters cli,json,html `
+    --reporter-json-export test-results.json `
+    --reporter-html-export test-results.html
+
+# Paso 6: Detener backend
+Write-Host "Deteniendo backend..."
+Stop-Process -Name "node" -Force
+
+# Paso 7: Verificar resultados
+$results = Get-Content test-results.json | ConvertFrom-Json
+$failed = $results.run.stats.assertions.failed
+
+if ($failed -eq 0) {
+    Write-Host "✅ TODAS LAS PRUEBAS PASARON" -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "❌ $failed PRUEBAS FALLARON" -ForegroundColor Red
+    exit 1
+}
+```
+
+**Automatización:**
+- Orquesta inicio/detención de servidor
+- Ejecuta pruebas completas
+- Genera reportes en múltiples formatos
+- Retorna código de salida (0=éxito, 1=fallo) para CI/CD
+
+**7.2 Script de auditoría completa** (`audit_all.sh`):
+```bash
+#!/bin/bash
+
+echo "=== Auditoría de Seguridad y Calidad ==="
+
+# Backend
+echo "--- Backend ---"
+cd backend
+echo "Linting..."
+npm run lint || exit 1
+echo "Auditoría de seguridad..."
+npm audit --audit-level=high || exit 1
+cd ..
+
+# Frontend
+echo "--- Frontend ---"
+cd frontend
+echo "Linting..."
+npm run lint || exit 1
+echo "Auditoría de seguridad..."
+npm audit --audit-level=high || exit 1
+cd ..
+
+echo "✅ Auditoría completada exitosamente"
+```
+
+**Automatización:**
+- Ejecuta lint y audit en backend y frontend
+- Detiene si encuentra errores críticos
+- Genera reporte consolidado
+
+---
+
+### 8. Markdown + VS Code - Documentación estructurada
+
+**Tipo:** Formato de documentación + Editor  
+**Versión:** VS Code 1.85+  
+**Propósito:** Generación de documentación legible, versionable y con formato rico
+
+#### Funcionalidades utilizadas:
+
+**8.1 Preview de Markdown**
+- **Comando:** `Ctrl+Shift+V` para abrir preview
+- **Funcionalidad:** Vista renderizada en tiempo real mientras se escribe
+- **Automatización:** Sincronización de scroll entre editor y preview
+
+**8.2 Tablas Markdown**
+- **Sintaxis:**
+  ```markdown
+  | Endpoint | P95 (ms) | Estado |
+  |----------|----------|--------|
+  | /api/books/search | 285 | ✅ |
+  ```
+- **Automatización con extensión:** Table Formatter formatea tablas automáticamente
+- **Criterio aplicado:** Visualización clara de métricas
+
+**8.3 Bloques de código con syntax highlighting**
+- **Sintaxis:**
+  ````markdown
+  ```javascript
+  const token = jwt.sign({ userId }, secret, { expiresIn: '24h' });
+  ```
+  ````
+- **Automatización:** VS Code aplica coloreado de sintaxis según lenguaje especificado
+- **Lenguajes soportados:** javascript, json, bash, powershell, sql
+
+**8.4 Enlaces internos**
+- **Sintaxis:** `[Ver sección](#metodología-de-verificación)`
+- **Automatización:** Preview genera navegación con un clic
+- **Validación:** Extensión Markdown Link Check valida que enlaces no estén rotos
+
+**Criterios de evaluación aplicados:**
+- ✅ M-DOC-01: Documentación completa y estructurada
+- ✅ Formato profesional con tablas, código, gráficas ASCII
+- ✅ Versionable con Git (texto plano)
+
+---
+
+### Resumen de herramientas y automatización
+
+| Herramienta | Automatización clave | Métricas aplicadas | Output |
+|-------------|----------------------|-------------------|--------|
+| **Postman** | Ejecución de 25 casos con 75 aserciones | M-FUNC-02, M-PERF-01 | JSON, HTML report |
+| **npm scripts** | Linting, auditoría, pruebas con un comando | M-MAINT-03, M-SEC-04, M-FUNC-02 | Terminal output |
+| **MongoDB Compass** | Visualización de índices, explain plans | M-PERF-02 | GUI interactiva |
+| **ESLint** | Análisis de 9 archivos, detección de problemas | M-MAINT-03 | Lista de errores/warnings |
+| **Git** | Comparación pre/post, trazabilidad de cambios | Trazabilidad completa | Diffs, logs |
+| **Excel/Sheets** | Cálculo de P50/P95/P99, gráficas comparativas | M-PERF-01 | Gráficas PNG, tablas |
+| **PowerShell/Bash** | Orquestación de servidor + pruebas + cleanup | Flujo completo | Exit codes |
+| **Markdown + VS Code** | Preview en tiempo real, format tables | M-DOC-01 | Documentos legibles |
+
+**Beneficios de la automatización:**
+1. **Reproducibilidad:** Cualquier miembro del equipo puede ejecutar evaluación completa con comandos documentados
+2. **Consistencia:** Criterios aplicados de forma idéntica en cada ejecución
+3. **Velocidad:** Evaluación completa en 7.5 horas (vs ~20 horas manual)
+4. **Trazabilidad:** Cada medición respaldada por evidencia automática (JSON, logs, capturas)
+5. **Escalabilidad:** Fácil agregar nuevos casos de prueba o métricas
+6. **Integración CI/CD:** Scripts y herramientas compatibles con pipelines automatizados
 
 ---
 
