@@ -36,16 +36,24 @@ router.get("/search", async (req, res) => {
             searchCriteria.bookStatus = status;
         }
         
-        let books = await Book.find(searchCriteria).populate("categories").populate("transactions");
-        
-        // Filter by category if specified
+        // If category is provided, resolve matching category IDs and include at DB level
         if (category) {
-            books = books.filter(book => 
-                book.categories.some(cat => 
-                    cat.categoryName.toLowerCase().includes(category.toLowerCase())
-                )
-            );
+            const matchingCategories = await BookCategory.find({
+                categoryName: { $regex: category, $options: 'i' }
+            }).select('_id');
+
+            const categoryIds = matchingCategories.map(c => c._id);
+            if (categoryIds.length > 0) {
+                searchCriteria.categories = { $in: categoryIds };
+            } else {
+                // No matching categories; short-circuit to empty result
+                return res.status(200).json({ success: true, count: 0, data: [] });
+            }
         }
+
+        let books = await Book.find(searchCriteria)
+            .populate("categories")
+            .populate("transactions");
         
         res.status(200).json({
             success: true,

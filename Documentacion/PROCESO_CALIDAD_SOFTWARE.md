@@ -17,6 +17,12 @@ El presente documento describe el proceso y los instrumentos de calidad de softw
 
 ---
 
+### Actualización 25/12/2025
+- Se incorporó Integración Continua (CI) en `.github/workflows/ci.yml` para ejecutar lint, auditoría de seguridad y pruebas de API (Newman) en cada push/PR.
+- Se añadió `CONTRIBUTING.md` con flujo de trabajo, convención de commits y checklist de calidad para Pull Requests.
+- Se configuró `ESLint` en `backend` con scripts (`npm run lint`, `npm run lint:fix`) para reforzar mantenibilidad.
+- Ver detalles y justificación en `INFORME_EVALUACION_METODOLOGIA.md`.
+
 ## Marco de referencia y buenas prácticas
 
 ### ISO/IEC 25010 (Modelo de Calidad del Producto)
@@ -85,6 +91,41 @@ Se diligenciaron los instrumentos diseñados, vinculando las actividades persona
 - Cobertura de pruebas: backend crítico ≥ 70%; crecimiento sostenido.
 - Seguridad: 0 vulnerabilidades de severidad alta según auditoría de dependencias.
 - Mantenibilidad: deuda técnica reducida (issues lint ≤ N por módulo).
+
+---
+
+## Ajustes Metodológicos (25/12/2025)
+
+Con base en la evaluación del comportamiento del proceso y la metodología seleccionada (Scrum + XP con prácticas DevOps), se aplicaron cambios a nivel operativo y técnico para mejorar el flujo de desarrollo y verificación:
+
+### Metodología reconocida
+- Scrum (sprints semanales, DoD con pruebas y documentación, retrospectivas).
+- XP (refactorización, revisión de código, pruebas automatizadas).
+- DevOps (scripts operativos, auditorías, contenedorización).
+
+### Cambios propuestos en la secuencia de ejecución
+1. Al inicio de cada sprint: definir métricas y criterios de aceptación (ISO/IEC 25010) por historia.
+2. Durante el desarrollo: escribir pruebas de API en paralelo y ejecutar colección completa tras cambios críticos.
+3. Antes del commit: ejecutar `lint` y `audit` (automatizado con scripts de npm).
+4. En verificación: medir P95/P99 de endpoints críticos y registrar hallazgos.
+5. En documentación: actualizar evidencias y trazabilidad requisito → prueba.
+
+### Cambios operativos aplicados
+- `backend/package.json`: se agregaron scripts para pruebas Postman en Windows/Unix y auditoría automática:
+  - `start:dev`, `audit:fix`, `test:postman:win`, `test:postman:unix`.
+
+### Cambios técnicos aplicados
+- `backend/routes/search.js`: filtro por categoría ahora se realiza a nivel de base de datos usando IDs de categoría (mejor rendimiento).
+- `backend/models/Book.js`: se añadieron índices en campos consultados frecuentemente (`author`, `language`, `bookStatus`, `bookCountAvailable`, `createdAt`, `categories`).
+
+### Buenas prácticas seleccionadas (referente de marcos)
+- ISO/IEC 25010: métricas accionables (P95 < 500 ms, 0 vulnerabilidades altas, <1% 5xx).
+- XP: refactorización temprana, revisión de código, pruebas automatizadas.
+- DevOps: scripts estandarizados para auditoría y pruebas, contenedorización.
+
+### Evidencias y documentación
+- Detalle y resultados en `INFORME_RESULTADOS_CALIDAD.md` y `INFORME_LECCIONES_APRENDIDAS.md`.
+- Bitácora y defectos vinculados en `BITACORA_DESARROLLO.md`.
 
 ### 2.1) Checklist diligenciado (ejemplo de iteración)
 | Fase           | Ítem clave                                                        | Cumplido | Responsable | Evidencia/Fecha |
